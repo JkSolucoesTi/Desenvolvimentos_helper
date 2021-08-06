@@ -1,0 +1,59 @@
+$('#formImportaFebraban').submit(function (event) {
+
+        ShowLoading();
+
+        event.preventDefault();
+
+        var formData = new FormData(this);
+        console.log(formData);
+
+        $.ajax({
+            url: '/PPG/UploadArquivoFebraban',
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+
+                if (response.error) {
+                    AlertBox('Erro', response.message);
+                    $('#formImportaFebraban')[0].reset();
+                    HideLoading();
+
+                    return;
+                }
+
+                var line = '';
+                var infos = response.data;
+
+                if (infos != null) {
+
+                    for (var i = 0; i < infos.length; i++) {
+
+                        console.log(infos[i]);
+
+                        line += '<tr>';
+                        line += '<td>' + infos[i].sFornecedor + '</td>';
+                        line += '<td>' + infos[i].nro_Nota + '</td>';
+                        line += '<td>' + infos[i].sdT_Emissao + '</td>';
+                        line += '<td>' + infos[i].sdT_Vencimento + '</td>';                        
+                        line += '<td>' + infos[i].serie + '</td>';
+                        line += '<td> R$ ' + infos[i].valor + '</td>';
+                        line += '</tr>';
+
+                    }
+                }
+
+                $('#tblInfosNfe').append(line);
+
+                $('#formImportaFebraban')[0].reset();
+
+
+                $('#divTableInfosNfe').slideDown();
+
+
+                HideLoading();
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
